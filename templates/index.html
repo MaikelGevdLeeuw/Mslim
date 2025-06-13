@@ -1,18 +1,20 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Permits</title>
+  <title>Permit Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-10">
-  <div class="max-w-5xl mx-auto bg-white p-6 rounded shadow space-y-6">
+<body class="bg-gray-100 p-10 text-sm">
+  <div class="max-w-6xl mx-auto bg-white p-6 rounded shadow space-y-6">
 
-    <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded">
+    <!-- Navigatie -->
+    <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded mb-6">
       <div class="space-x-4">
         <a href="/" class="hover:underline">Permits</a>
         <a href="/assets" class="hover:underline">Assets</a>
-        <a href="/settings" class="hover:underline">Settings</a>
+        <a href="/home" class="hover:underline">Home</a>
+        <a href="/shift" class="hover:underline">Shift</a>
       </div>
       <div>
         Ingelogd als <strong>{{ session['user'] }}</strong> |
@@ -20,7 +22,7 @@
       </div>
     </div>
 
-    <h2 class="text-xl font-bold">Nieuwe Permit</h2>
+    <h1 class="text-xl font-bold">Permit Aanvragen</h1>
     <form method="POST" action="/submit" class="grid grid-cols-2 gap-4 bg-gray-100 p-4 rounded">
       <div>
         <label>Categorie</label>
@@ -32,17 +34,6 @@
         </select>
       </div>
 
-
-
-      <div>
-  <label>Verdieping</label>
-  <input name="floor" required class="w-full border p-1 rounded">
-</div>
-
-<div>
-  <label>Kamer</label>
-  <input name="room" required class="w-full border p-1 rounded">
-</div>
       <div>
         <label>Asset</label>
         <select name="asset" id="asset-select" required class="w-full border p-1 rounded">
@@ -58,6 +49,16 @@
       <div>
         <label>Site</label>
         <input name="site" id="site-field" readonly class="w-full border p-1 rounded bg-gray-200">
+      </div>
+
+      <div>
+        <label>Verdieping</label>
+        <input name="floor" required class="w-full border p-1 rounded">
+      </div>
+
+      <div>
+        <label>Kamer</label>
+        <input name="room" required class="w-full border p-1 rounded">
       </div>
 
       <div>
@@ -90,33 +91,40 @@
       </div>
     </form>
 
-    <h2 class="text-xl font-bold mt-10">Permits Vandaag</h2>
-    <table class="w-full border text-sm">
+    <!-- Vandaag openstaande permits -->
+    <h2 class="text-lg font-semibold mt-10">Permits vandaag</h2>
+    <table class="w-full text-left border mt-2">
       <thead>
-        <tr>
-          <th class="border p-1">#</th>
-          <th class="border p-1">Datum</th>
-          <th class="border p-1">Tijd</th>
-          <th class="border p-1">Engineer</th>
-          <th class="border p-1">Asset</th>
-          <th class="border p-1">Status</th>
+        <tr class="bg-gray-200">
+          <th class="p-2 border">Nummer</th>
+          <th class="p-2 border">Datum</th>
+          <th class="p-2 border">Tijd</th>
+          <th class="p-2 border">Categorie</th>
+          <th class="p-2 border">Asset</th>
+          <th class="p-2 border">Ruimte</th>
+          <th class="p-2 border">Status</th>
+          <th class="p-2 border">Engineer</th>
         </tr>
       </thead>
       <tbody>
         {% for p in today_permits %}
         <tr>
-          <td class="border p-1">{{ p.number }}</td>
-          <td class="border p-1">{{ p.date }}</td>
-          <td class="border p-1">{{ p.time }}</td>
-          <td class="border p-1">{{ p.engineer }}</td>
-          <td class="border p-1">{{ p.asset }}</td>
-          <td class="border p-1">{{ p.status }}</td>
+          <td class="border px-2">{{ p.number }}</td>
+          <td class="border px-2">{{ p.date }}</td>
+          <td class="border px-2">{{ p.time }}</td>
+          <td class="border px-2">{{ p.category }}</td>
+          <td class="border px-2">{{ p.asset }}</td>
+          <td class="border px-2">{{ p.area }}</td>
+          <td class="border px-2">{{ p.status }}</td>
+          <td class="border px-2">{{ p.engineer }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+
   </div>
 
+  <!-- Javascript dropdown logica -->
   <script>
     const categorySelect = document.getElementById('category-select');
     const assetSelect = document.getElementById('asset-select');
