@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
   <head>
@@ -8,6 +7,7 @@
   </head>
   <body class="bg-gray-100 text-gray-900 font-sans p-8">
     <div class="max-w-5xl mx-auto bg-white shadow-md rounded-xl p-6 space-y-6">
+      
       <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center mb-6 rounded">
         <div class="flex space-x-4">
           <a href="/" class="hover:underline">Permits</a>
@@ -19,10 +19,11 @@
           <a href="/logout" class="text-red-300 hover:underline">Uitloggen</a>
         </div>
       </div>
+
       <form method="POST" action="/submit" class="grid grid-cols-2 gap-4">
         <div><label>Datum:</label><input type="date" name="date" required class="w-full border rounded px-2 py-1"></div>
         <div><label>Tijd:</label><input type="time" name="time" required class="w-full border rounded px-2 py-1"></div>
-        <div><label>Gebied (Area):</label><input type="text" name="area" required class="w-full border rounded px-2 py-1"></div>
+        <div><label>Gebied:</label><input type="text" name="area" required class="w-full border rounded px-2 py-1"></div>
         <div><label>Type werkzaamheden:</label><input type="text" name="type" required class="w-full border rounded px-2 py-1"></div>
         <div>
           <label>ISO gerelateerd:</label>
@@ -32,24 +33,32 @@
           </select>
         </div>
         <div><label>CHG Nummer:</label><input type="text" name="chg" required class="w-full border rounded px-2 py-1"></div>
-        <div class="col-span-2"><button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Permit aanvragen</button></div>
+        <div class="col-span-2">
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Permit aanvragen</button>
+        </div>
       </form>
+
+      <!-- Permits van vandaag -->
       <div>
-        <h2 class="text-xl font-semibold mt-6 mb-2">Aangevraagde permits</h2>
+        <h2 class="text-xl font-semibold mt-10 mb-2">Permits voor vandaag ({{ today_permits|length }})</h2>
+        {% if today_permits %}
         <table class="table-auto w-full border border-gray-300 text-sm">
-          <thead class="bg-gray-200">
+          <thead class="bg-yellow-100">
             <tr>
-              <th class="p-2 border">#</th><th class="p-2 border">Engineer</th><th class="p-2 border">Datum</th>
-              <th class="p-2 border">Tijd</th><th class="p-2 border">Gebied</th><th class="p-2 border">Type</th>
-              <th class="p-2 border">ISO</th><th class="p-2 border">CHG</th>
+              <th class="p-2 border">#</th>
+              <th class="p-2 border">Engineer</th>
+              <th class="p-2 border">Tijd</th>
+              <th class="p-2 border">Gebied</th>
+              <th class="p-2 border">Type</th>
+              <th class="p-2 border">ISO</th>
+              <th class="p-2 border">CHG</th>
             </tr>
           </thead>
           <tbody>
-            {% for p in permits %}
-            <tr class="hover:bg-gray-50">
+            {% for p in today_permits %}
+            <tr class="hover:bg-yellow-50">
               <td class="p-2 border">{{ p.get('number', '-') }}</td>
               <td class="p-2 border">{{ p.get('engineer', '-') }}</td>
-              <td class="p-2 border">{{ p.get('date', '-') }}</td>
               <td class="p-2 border">{{ p.get('time', '-') }}</td>
               <td class="p-2 border">{{ p.get('area', '-') }}</td>
               <td class="p-2 border">{{ p.get('type', '-') }}</td>
@@ -59,7 +68,5 @@
             {% endfor %}
           </tbody>
         </table>
-      </div>
-    </div>
-  </body>
-</html>
+        {% else %}
+        <p class="text-gray-500">Geen permits voor vanda
