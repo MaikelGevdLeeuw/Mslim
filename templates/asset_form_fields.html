@@ -1,0 +1,68 @@
+<div>
+  <label>Naam</label>
+  <input name="name" required class="w-full border p-1 rounded" value="{{ asset.name if asset else '' }}">
+</div>
+<div>
+  <label>Type</label>
+  <input name="type" class="w-full border p-1 rounded" value="{{ asset.type if asset else '' }}">
+</div>
+<div>
+  <label>Categorie</label>
+  <input name="category" class="w-full border p-1 rounded" value="{{ asset.category if asset else '' }}">
+</div>
+<div>
+  <label>Locatie</label>
+  <input name="location" class="w-full border p-1 rounded" value="{{ asset.location if asset else '' }}">
+</div>
+<div>
+  <label>Verdieping</label>
+  <input name="floor" class="w-full border p-1 rounded" value="{{ asset.floor if asset else '' }}">
+</div>
+<div>
+  <label>Site</label>
+  <input name="site" class="w-full border p-1 rounded" value="{{ asset.site if asset else '' }}">
+</div>
+<div>
+  <label>Serienummer</label>
+  <input name="serial" class="w-full border p-1 rounded" value="{{ asset.serial if asset else '' }}">
+</div>
+<div>
+  <label>Installatiedatum</label>
+  <input name="install_date" type="date" class="w-full border p-1 rounded" value="{{ asset.install_date if asset else '' }}">
+</div>
+<div>
+  <label>Laatste onderhoud</label>
+  <input name="last_maintenance" type="date" class="w-full border p-1 rounded" value="{{ asset.last_maintenance if asset else '' }}">
+</div>
+<div>
+  <label>Vervaldatum onderhoud</label>
+  <input name="maintenance_due" type="date" class="w-full border p-1 rounded" value="{{ asset.maintenance_due if asset else '' }}">
+</div>
+<div>
+  <label>Onderhoudsinterval</label>
+  <input name="maintenance_interval" class="w-full border p-1 rounded" value="{{ asset.maintenance_interval if asset else '' }}">
+</div>
+<div>
+  <label>ISO</label>
+  <input name="iso" class="w-full border p-1 rounded" value="{{ asset.iso if asset else '' }}">
+</div>
+<div>
+  <label>Vendor</label>
+  <input name="vendor" class="w-full border p-1 rounded" value="{{ asset.vendor if asset else '' }}">
+</div>
+<div>
+  <label>Vendor Telefoon</label>
+  <input name="vendor_phone" class="w-full border p-1 rounded" value="{{ asset.vendor_phone if asset else '' }}">
+</div>
+<div>
+  <label>Vendor Email</label>
+  <input name="vendor_email" class="w-full border p-1 rounded" value="{{ asset.vendor_email if asset else '' }}">
+</div>
+<div>
+  <label>Notities</label>
+  <textarea name="notes" class="w-full border p-1 rounded">{{ asset.notes if asset else '' }}</textarea>
+</div>
+<div class="col-span-2 flex items-center gap-4">
+  <label><input type="checkbox" name="vendor_contract_active" {% if asset and asset.vendor_contract_active %}checked{% endif %}> Vendor contract actief</label>
+  <label><input type="checkbox" name="active" {% if asset and asset.active %}checked{% endif %}> Actief</label>
+</div>
