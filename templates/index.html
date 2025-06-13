@@ -2,14 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Permit Systeem</title>
+    <title>Permits</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="bg-gray-100 text-gray-900 font-sans p-8">
-    <div class="max-w-5xl mx-auto bg-white shadow-md rounded-xl p-6 space-y-6">
-      
-      <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center mb-6 rounded">
-        <div class="flex space-x-4">
+  <body class="bg-gray-100 p-10">
+    <div class="max-w-6xl mx-auto bg-white p-6 rounded shadow space-y-6">
+      <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded">
+        <div class="space-x-4">
           <a href="/" class="hover:underline">Permits</a>
           <a href="/assets" class="hover:underline">Assets</a>
           <a href="/settings" class="hover:underline">Settings</a>
@@ -21,52 +20,79 @@
       </div>
 
       <form method="POST" action="/submit" class="grid grid-cols-2 gap-4">
-        <div><label>Datum:</label><input type="date" name="date" required class="w-full border rounded px-2 py-1"></div>
-        <div><label>Tijd:</label><input type="time" name="time" required class="w-full border rounded px-2 py-1"></div>
-        <div><label>Gebied:</label><input type="text" name="area" required class="w-full border rounded px-2 py-1"></div>
-        <div><label>Type werkzaamheden:</label><input type="text" name="type" required class="w-full border rounded px-2 py-1"></div>
+        <input type="hidden" name="engineer" value="{{ session['user'] }}">
+        <div><label>Datum:</label><input type="date" name="date" required class="w-full border px-2 py-1 rounded"></div>
+        <div><label>Tijd:</label><input type="time" name="time" required class="w-full border px-2 py-1 rounded"></div>
+        <div><label>Gebied:</label><input type="text" name="area" required class="w-full border px-2 py-1 rounded"></div>
+        <div><label>Type:</label><input type="text" name="type" required class="w-full border px-2 py-1 rounded"></div>
         <div>
           <label>ISO gerelateerd:</label>
-          <select name="iso" required class="w-full border rounded px-2 py-1">
+          <select name="iso" class="w-full border px-2 py-1 rounded">
             <option value="Ja">Ja</option>
             <option value="Nee">Nee</option>
           </select>
         </div>
-        <div><label>CHG Nummer:</label><input type="text" name="chg" required class="w-full border rounded px-2 py-1"></div>
+        <div><label>CHG Nummer:</label><input type="text" name="chg" required class="w-full border px-2 py-1 rounded"></div>
         <div class="col-span-2">
-          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Permit aanvragen</button>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Aanvragen</button>
         </div>
       </form>
 
-      <!-- Permits van vandaag -->
-      <div>
-        <h2 class="text-xl font-semibold mt-10 mb-2">Permits voor vandaag ({{ today_permits|length }})</h2>
-        {% if today_permits %}
-        <table class="table-auto w-full border border-gray-300 text-sm">
-          <thead class="bg-yellow-100">
-            <tr>
-              <th class="p-2 border">#</th>
-              <th class="p-2 border">Engineer</th>
-              <th class="p-2 border">Tijd</th>
-              <th class="p-2 border">Gebied</th>
-              <th class="p-2 border">Type</th>
-              <th class="p-2 border">ISO</th>
-              <th class="p-2 border">CHG</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for p in today_permits %}
-            <tr class="hover:bg-yellow-50">
-              <td class="p-2 border">{{ p.get('number', '-') }}</td>
-              <td class="p-2 border">{{ p.get('engineer', '-') }}</td>
-              <td class="p-2 border">{{ p.get('time', '-') }}</td>
-              <td class="p-2 border">{{ p.get('area', '-') }}</td>
-              <td class="p-2 border">{{ p.get('type', '-') }}</td>
-              <td class="p-2 border">{{ p.get('iso', '-') }}</td>
-              <td class="p-2 border">{{ p.get('chg', '-') }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        {% else %}
-        <p class="text-gray-500">Geen permits voor vanda
+      <h2 class="text-xl font-bold">Permits voor vandaag</h2>
+      <table class="table-auto w-full border border-gray-300 text-sm">
+        <thead class="bg-yellow-100">
+          <tr>
+            <th class="p-2 border">#</th>
+            <th class="p-2 border">Tijd</th>
+            <th class="p-2 border">Gebied</th>
+            <th class="p-2 border">Type</th>
+            <th class="p-2 border">CHG</th>
+            <th class="p-2 border">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in today_permits %}
+          <tr>
+            <td class="p-2 border">{{ p.number }}</td>
+            <td class="p-2 border">{{ p.time }}</td>
+            <td class="p-2 border">{{ p.area }}</td>
+            <td class="p-2 border">{{ p.type }}</td>
+            <td class="p-2 border">{{ p.chg }}</td>
+            <td class="p-2 border">{{ p.status }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <h2 class="text-xl font-bold">Alle permits</h2>
+      <table class="table-auto w-full border border-gray-300 text-sm">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="p-2 border">#</th>
+            <th class="p-2 border">Engineer</th>
+            <th class="p-2 border">Datum</th>
+            <th class="p-2 border">Tijd</th>
+            <th class="p-2 border">Gebied</th>
+            <th class="p-2 border">Type</th>
+            <th class="p-2 border">CHG</th>
+            <th class="p-2 border">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in permits %}
+          <tr>
+            <td class="p-2 border">{{ p.number }}</td>
+            <td class="p-2 border">{{ p.engineer }}</td>
+            <td class="p-2 border">{{ p.date }}</td>
+            <td class="p-2 border">{{ p.time }}</td>
+            <td class="p-2 border">{{ p.area }}</td>
+            <td class="p-2 border">{{ p.type }}</td>
+            <td class="p-2 border">{{ p.chg }}</td>
+            <td class="p-2 border">{{ p.status }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
