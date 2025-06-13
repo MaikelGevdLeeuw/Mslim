@@ -90,5 +90,12 @@ def logout():
     session.pop('role', None)
     return redirect('/login')
 
+@app.route('/assets')
+def show_assets():
+    if not session.get("user"):
+        return redirect("/login")
+
+    return render_template("assets.html", assets=assets, role=session.get("role"))
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
