@@ -4,23 +4,21 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'geheim123'  # gebruik een sterke secret key in productie
 
-# Gebruikers (in de toekomst kun je dit uit een database halen)
+# Gebruikers
 users = {
     "admin": "test123"
 }
 
-# Tijdelijke opslag (wordt gewist bij restart)
+# Tijdelijke opslag
 permits = []
 assets = []
 
-# Homepagina – Permit formulier
 @app.route('/')
 def index():
     if not session.get("user"):
         return redirect("/login")
     return render_template('index.html', permits=permits)
 
-# Permit aanvraag verwerken
 @app.route('/submit', methods=['POST'])
 def submit():
     if not session.get("user"):
@@ -39,7 +37,6 @@ def submit():
     permits.append(permit)
     return redirect('/')
 
-# Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -51,20 +48,17 @@ def login():
         return "Foutieve login. Probeer opnieuw."
     return render_template('login.html')
 
-# Logout
 @app.route('/logout')
 def logout():
     session.pop('user', None)
     return redirect('/login')
 
-# Asset overzicht
 @app.route('/assets')
 def asset_list():
     if not session.get("user"):
         return redirect("/login")
     return render_template('assets.html', assets=assets)
 
-# Asset toevoegen
 @app.route('/add_asset', methods=['POST'])
 def add_asset():
     if not session.get("user"):
@@ -80,6 +74,5 @@ def add_asset():
     assets.append(asset)
     return redirect('/assets')
 
-# Start de app
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
