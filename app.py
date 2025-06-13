@@ -10,67 +10,30 @@ users = {
 }
 
 permits = []
-assets = [
-    {
-        'id': 1,
-        'name': 'Koeling A',
-        'type': 'HVAC',
-        'category': 'Cooling',
-        'location': 'Room 1',
-        'floor': '1',
-        'site': 'AMS1',
-        'serial': 'ABC123',
-        'vendor': 'CoolTech BV',
-        'vendor_phone': '+31 20 123 4567',
-        'vendor_email': 'service@cooltech.nl',
-        'install_date': '2023-01-10',
-        'last_maintenance': '2024-06-01',
-        'maintenance_due': '2025-06-01',
-        'maintenance_interval': '12 maanden',
-        'vendor_contract_active': True,
-        'active': True,
-        'iso': 'ISO-50001',
-        'notes': 'Zit aangesloten op N+1 koelsysteem'
-    },
-    {
-        'id': 2,
-        'name': 'PDU 5',
-        'type': 'Power',
-        'category': 'Power',
-        'location': 'Room 2',
-        'floor': '2',
-        'site': 'AMS1',
-        'serial': 'XYZ456',
-        'vendor': 'PowerFlow BV',
-        'vendor_phone': '+31 10 987 6543',
-        'vendor_email': 'support@powerflow.nl',
-        'install_date': '2022-09-15',
-        'last_maintenance': '2024-03-20',
-        'maintenance_due': '2025-03-20',
-        'maintenance_interval': '12 maanden',
-        'vendor_contract_active': False,
-        'active': False,
-        'iso': 'ISO-9001',
-        'notes': 'PDU buiten gebruik gesteld wegens lekkage'
-    }
+assets = []
+tasks = [
+    {"assigned_to": "user1", "title": "Controleer noodverlichting", "status": "open"},
+    {"assigned_to": "user1", "title": "Inspectie koeling A", "status": "in progress"},
 ]
+shifts = {
+    "user1": {"log": "Start shift om 07:00. Controle op HVAC uitgevoerd."},
+    "admin": {"log": "Shift overview admin."},
+}
+
 
 @app.route('/')
 def index():
     if not session.get("user"):
         return redirect("/login")
 
-    role = session.get("role")
-    username = session.get("user")
+    username = session["user"]
+    role = session["role"]
     today = datetime.today().strftime("%Y-%m-%d")
+    relevant_permits = permits if role == "admin" else [p for p in permits if p["engineer"] == username]
+    today_permits = [p for p in relevant_permits if p["date"] == today]
 
-    if role == "admin":
-        today_permits = [p for p in permits if p.get("date") == today]
-        return render_template("index.html", permits=permits, today_permits=today_permits, role=role, assets=assets)
+    return render_template("index.html", permits=relevant_permits, today_permits=today_permits, role=role, assets=assets)
 
-    user_permits = [p for p in permits if p.get("engineer") == username]
-    today_permits = [p for p in user_permits if p.get("date") == today]
-    return render_template("index.html", permits=user_permits, today_permits=today_permits, role=role, assets=assets)
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -87,6 +50,8 @@ def submit():
         'time': request.form['time'],
         'area': request.form['area'],
         'site': request.form['site'],
+        'floor': request.form['floor'],
+        'room': request.form['room'],
         'type': request.form['type'],
         'iso': request.form['iso'],
         'chg': request.form['chg'],
@@ -97,10 +62,12 @@ def submit():
     permits.append(permit)
     return redirect('/')
 
+
 @app.route('/get_assets_by_category/<category>')
 def get_assets_by_category(category):
     filtered = [a for a in assets if a['category'] == category]
     return jsonify(filtered)
+
 
 @app.route('/update_status/<int:number>', methods=['POST'])
 def update_status(number):
@@ -114,29 +81,46 @@ def update_status(number):
             break
     return redirect('/')
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         user = users.get(username)
-
         if user and user['password'] == password:
             session['user'] = username
             session['role'] = user['role']
             return redirect('/')
         return "Foutieve login. Probeer opnieuw."
-
     return render_template('login.html')
+
 
 @app.route('/logout')
 def logout():
-    session.pop('user', None)
-    session.pop('role', None)
+    session.clear()
     return redirect('/login')
 
-@app.route('/assets')
-def show_assets():
+
+@app.route('/home')
+def home():
     if not session.get("user"):
         return redirect("/login")
-    return render_template("assets.html", assets=assets, role=session.get("role"))
+    user = session["user"]
+    user_tasks = [t for t in tasks if t["assigned_to"] == user]
+    return render_template("home.html", tasks=user_tasks, user=user)
+
+
+@app.route('/shift', methods=["GET", "POST"])
+def shift():
+    if not session.get("user"):
+        return redirect("/login")
+
+    user = session["user"]
+    if request.method == "POST":
+        new_log = request.form.get("log", "")
+        shifts[user] = {"log": new_log}
+        return redirect("/shift")
+
+    log = shifts.get(user, {}).get("log", "")
+    return render_template("shift.html", log=log, user=user)
