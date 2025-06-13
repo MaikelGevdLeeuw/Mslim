@@ -2,14 +2,12 @@ from flask import Flask, render_template, request, redirect, session
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'geheim123'  # gebruik een sterke secret key in productie
+app.secret_key = 'geheim123'
 
-# Gebruikers
 users = {
     "admin": "test123"
 }
 
-# Tijdelijke opslag
 permits = []
 assets = []
 
@@ -17,7 +15,11 @@ assets = []
 def index():
     if not session.get("user"):
         return redirect("/login")
-    return render_template('index.html', permits=permits)
+
+    today = datetime.today().strftime("%Y-%m-%d")
+    today_permits = [p for p in permits if p.get('date') == today]
+
+    return render_template('index.html', permits=permits, today_permits=today_permits)
 
 @app.route('/submit', methods=['POST'])
 def submit():
