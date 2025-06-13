@@ -1,6 +1,12 @@
 <!doctype html>
 <html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Assets</title>
+  </head>
   <body>
+    <p>Ingelogd als {{ session['user'] }} | <a href="/logout">Uitloggen</a></p>
+
     <h2>Asset toevoegen</h2>
     <form method="POST" action="/add_asset">
       Naam: <input name="name" required><br>
@@ -24,6 +30,6 @@
       {% endfor %}
     </table>
 
-    <a href="/">← Terug</a>
+    <p><a href="/">← Terug naar permits</a></p>
   </body>
 </html>
