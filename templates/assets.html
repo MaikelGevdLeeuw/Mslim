@@ -1,35 +1,57 @@
+
 <!doctype html>
 <html>
   <head>
     <meta charset="UTF-8">
     <title>Assets</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <p>Ingelogd als {{ session['user'] }} | <a href="/logout">Uitloggen</a></p>
-
-    <h2>Asset toevoegen</h2>
-    <form method="POST" action="/add_asset">
-      Naam: <input name="name" required><br>
-      Type: <input name="type" required><br>
-      Locatie: <input name="location" required><br>
-      Serienummer: <input name="serial" required><br>
-      <button type="submit">Toevoegen</button>
-    </form>
-
-    <h3>Assetlijst</h3>
-    <table border="1">
-      <tr><th>ID</th><th>Naam</th><th>Type</th><th>Locatie</th><th>Serienummer</th></tr>
-      {% for asset in assets %}
-        <tr>
-          <td>{{ asset.id }}</td>
-          <td>{{ asset.name }}</td>
-          <td>{{ asset.type }}</td>
-          <td>{{ asset.location }}</td>
-          <td>{{ asset.serial }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-
-    <p><a href="/">← Terug naar permits</a></p>
+  <body class="bg-gray-100 text-gray-900 font-sans p-8">
+    <div class="max-w-5xl mx-auto bg-white shadow-md rounded-xl p-6 space-y-6">
+      <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center mb-6 rounded">
+        <div class="flex space-x-4">
+          <a href="/" class="hover:underline">Permits</a>
+          <a href="/assets" class="hover:underline">Assets</a>
+          <a href="/settings" class="hover:underline">Settings</a>
+        </div>
+        <div>
+          Ingelogd als <strong>{{ session['user'] }}</strong> |
+          <a href="/logout" class="text-red-300 hover:underline">Uitloggen</a>
+        </div>
+      </div>
+      <h2 class="text-xl font-semibold">Asset toevoegen</h2>
+      <form method="POST" action="/add_asset" class="grid grid-cols-2 gap-4">
+        <div><label>Naam:</label><input name="name" required class="w-full border rounded px-2 py-1"></div>
+        <div><label>Type:</label><input name="type" required class="w-full border rounded px-2 py-1"></div>
+        <div><label>Locatie:</label><input name="location" required class="w-full border rounded px-2 py-1"></div>
+        <div><label>Serienummer:</label><input name="serial" required class="w-full border rounded px-2 py-1"></div>
+        <div class="col-span-2">
+          <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Toevoegen</button>
+        </div>
+      </form>
+      <h3 class="text-lg font-semibold mt-6">Assetlijst</h3>
+      <table class="table-auto w-full border border-gray-300 text-sm">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="p-2 border">ID</th>
+            <th class="p-2 border">Naam</th>
+            <th class="p-2 border">Type</th>
+            <th class="p-2 border">Locatie</th>
+            <th class="p-2 border">Serienummer</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for asset in assets %}
+          <tr class="hover:bg-gray-50">
+            <td class="p-2 border">{{ asset.id }}</td>
+            <td class="p-2 border">{{ asset.name }}</td>
+            <td class="p-2 border">{{ asset.type }}</td>
+            <td class="p-2 border">{{ asset.location }}</td>
+            <td class="p-2 border">{{ asset.serial }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </body>
 </html>
