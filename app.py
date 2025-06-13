@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, jsonify
 from datetime import datetime
 
 app = Flask(__name__)
@@ -31,6 +31,27 @@ assets = [
         'active': True,
         'iso': 'ISO-50001',
         'notes': 'Zit aangesloten op N+1 koelsysteem'
+    },
+    {
+        'id': 2,
+        'name': 'PDU 5',
+        'type': 'Power',
+        'category': 'Power',
+        'location': 'Room 2',
+        'floor': '2',
+        'site': 'AMS1',
+        'serial': 'XYZ456',
+        'vendor': 'PowerFlow BV',
+        'vendor_phone': '+31 10 987 6543',
+        'vendor_email': 'support@powerflow.nl',
+        'install_date': '2022-09-15',
+        'last_maintenance': '2024-03-20',
+        'maintenance_due': '2025-03-20',
+        'maintenance_interval': '12 maanden',
+        'vendor_contract_active': False,
+        'active': False,
+        'iso': 'ISO-9001',
+        'notes': 'PDU buiten gebruik gesteld wegens lekkage'
     }
 ]
 
@@ -64,7 +85,8 @@ def submit():
         'engineer': session.get('user'),
         'date': request.form['date'],
         'time': request.form['time'],
-        'area': asset['location'] if asset else '',
+        'area': request.form['area'],
+        'site': request.form['site'],
         'type': request.form['type'],
         'iso': request.form['iso'],
         'chg': request.form['chg'],
@@ -74,6 +96,11 @@ def submit():
     }
     permits.append(permit)
     return redirect('/')
+
+@app.route('/get_assets_by_category/<category>')
+def get_assets_by_category(category):
+    filtered = [a for a in assets if a['category'] == category]
+    return jsonify(filtered)
 
 @app.route('/update_status/<int:number>', methods=['POST'])
 def update_status(number):
@@ -86,80 +113,6 @@ def update_status(number):
             p["status"] = new_status
             break
     return redirect('/')
-
-@app.route('/assets')
-def show_assets():
-    if not session.get("user"):
-        return redirect("/login")
-
-    return render_template("assets.html", assets=assets, role=session.get("role"))
-
-@app.route('/asset/add', methods=['GET', 'POST'])
-def add_asset():
-    if session.get("role") != "admin":
-        return "Geen toegang", 403
-
-    if request.method == 'POST':
-        new_id = max([a['id'] for a in assets]) + 1 if assets else 1
-        new_asset = {
-            'id': new_id,
-            'name': request.form['name'],
-            'type': request.form['type'],
-            'category': request.form['category'],
-            'location': request.form['location'],
-            'floor': request.form['floor'],
-            'site': request.form['site'],
-            'serial': request.form['serial'],
-            'vendor': request.form['vendor'],
-            'vendor_phone': request.form['vendor_phone'],
-            'vendor_email': request.form['vendor_email'],
-            'install_date': request.form['install_date'],
-            'last_maintenance': request.form['last_maintenance'],
-            'maintenance_due': request.form['maintenance_due'],
-            'maintenance_interval': request.form['maintenance_interval'],
-            'vendor_contract_active': request.form.get('vendor_contract_active') == 'on',
-            'active': request.form.get('active') == 'on',
-            'iso': request.form['iso'],
-            'notes': request.form['notes']
-        }
-        assets.append(new_asset)
-        return redirect('/assets')
-
-    return render_template("add_asset.html")
-
-@app.route('/asset/edit/<int:asset_id>', methods=['GET', 'POST'])
-def edit_asset(asset_id):
-    if session.get("role") != "admin":
-        return "Geen toegang", 403
-
-    asset = next((a for a in assets if a["id"] == asset_id), None)
-    if not asset:
-        return "Asset niet gevonden", 404
-
-    if request.method == 'POST':
-        asset.update({
-            'name': request.form['name'],
-            'type': request.form['type'],
-            'category': request.form['category'],
-            'location': request.form['location'],
-            'floor': request.form['floor'],
-            'site': request.form['site'],
-            'serial': request.form['serial'],
-            'vendor': request.form['vendor'],
-            'vendor_phone': request.form['vendor_phone'],
-            'vendor_email': request.form['vendor_email'],
-            'install_date': request.form['install_date'],
-            'last_maintenance': request.form['last_maintenance'],
-            'maintenance_due': request.form['maintenance_due'],
-            'maintenance_interval': request.form['maintenance_interval'],
-            'vendor_contract_active': request.form.get('vendor_contract_active') == 'on',
-            'active': request.form.get('active') == 'on',
-            'iso': request.form['iso'],
-            'notes': request.form['notes']
-        })
-        return redirect('/assets')
-
-    return render_template("edit_asset.html", asset=asset)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -182,5 +135,8 @@ def logout():
     session.pop('role', None)
     return redirect('/login')
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+@app.route('/assets')
+def show_assets():
+    if not session.get("user"):
+        return redirect("/login")
+    return render_template("assets.html", assets=assets, role=session.get("role"))
