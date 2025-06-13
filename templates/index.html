@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <body>
+    <h2>Permit aanvragen</h2>
+    <form method="POST" action="/submit">
+      Naam: <input type="text" name="name" required>
+      <button type="submit">Aanvragen</button>
+    </form>
+
+    <h3>Aangevraagde permits</h3>
+    <ul>
+      {% for permit in permits %}
+        <li>{{ permit.name }}</li>
+      {% endfor %}
+    </ul>
+
+    <a href="/assets">Bekijk assets</a>
+  </body>
+</html>
