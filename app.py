@@ -4,8 +4,10 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'geheim123'
 
+# Gebruikers met rol
 users = {
-    "admin": "test123"
+    "admin": {"password": "admin123", "role": "admin"},
+    "user1": {"password": "user123", "role": "user"},
 }
 
 permits = []
@@ -16,10 +18,19 @@ def index():
     if not session.get("user"):
         return redirect("/login")
 
-    today = datetime.today().strftime("%Y-%m-%d")
-    today_permits = [p for p in permits if p.get('date') == today]
+    role = session.get("role")
+    username = session.get("user")
 
-    return render_template('index.html', permits=permits, today_permits=today_permits)
+    today = datetime.today().strftime("%Y-%m-%d")
+
+    if role == "admin":
+        today_permits = [p for p in permits if p.get("date") == today]
+        return render_template("index.html", permits=permits, today_permits=today_permits, role=role)
+
+    elif role == "user":
+        user_permits = [p for p in permits if p.get("engineer") == username]
+        today_permits = [p for p in user_permits if p.get("date") == today]
+        return render_template("index.html", permits=user_permits, today_permits=today_permits, role=role)
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -34,7 +45,8 @@ def submit():
         'area': request.form['area'],
         'type': request.form['type'],
         'iso': request.form['iso'],
-        'chg': request.form['chg']
+        'chg': request.form['chg'],
+        'status': 'pending'  # nieuw
     }
     permits.append(permit)
     return redirect('/')
@@ -44,37 +56,21 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if users.get(username) == password:
+        user = users.get(username)
+
+        if user and user['password'] == password:
             session['user'] = username
+            session['role'] = user['role']
             return redirect('/')
         return "Foutieve login. Probeer opnieuw."
+
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
     session.pop('user', None)
+    session.pop('role', None)
     return redirect('/login')
-
-@app.route('/assets')
-def asset_list():
-    if not session.get("user"):
-        return redirect("/login")
-    return render_template('assets.html', assets=assets)
-
-@app.route('/add_asset', methods=['POST'])
-def add_asset():
-    if not session.get("user"):
-        return redirect("/login")
-
-    asset = {
-        'id': len(assets) + 1,
-        'name': request.form['name'],
-        'type': request.form['type'],
-        'location': request.form['location'],
-        'serial': request.form['serial']
-    }
-    assets.append(asset)
-    return redirect('/assets')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
