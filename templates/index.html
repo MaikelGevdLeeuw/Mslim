@@ -39,3 +39,55 @@
             <option value="Ja">Ja</option>
             <option value="Nee">Nee</option>
           </select>
+        </div>
+        <div>
+          <label class="block mb-1">CHG Nummer:</label>
+          <input type="text" name="chg" required class="w-full border rounded px-2 py-1">
+        </div>
+        <div class="col-span-2">
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Permit aanvragen
+          </button>
+        </div>
+      </form>
+
+      <div>
+        <h2 class="text-xl font-semibold mt-6 mb-2">Aangevraagde permits</h2>
+        <div class="overflow-auto">
+          <table class="table-auto w-full border border-gray-300 text-sm">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="p-2 border">#</th>
+                <th class="p-2 border">Engineer</th>
+                <th class="p-2 border">Datum</th>
+                <th class="p-2 border">Tijd</th>
+                <th class="p-2 border">Gebied</th>
+                <th class="p-2 border">Type</th>
+                <th class="p-2 border">ISO</th>
+                <th class="p-2 border">CHG</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in permits %}
+              <tr class="hover:bg-gray-50">
+                <td class="p-2 border">{{ p.get('number', '-') }}</td>
+                <td class="p-2 border">{{ p.get('engineer', '-') }}</td>
+                <td class="p-2 border">{{ p.get('date', '-') }}</td>
+                <td class="p-2 border">{{ p.get('time', '-') }}</td>
+                <td class="p-2 border">{{ p.get('area', '-') }}</td>
+                <td class="p-2 border">{{ p.get('type', '-') }}</td>
+                <td class="p-2 border">{{ p.get('iso', '-') }}</td>
+                <td class="p-2 border">{{ p.get('chg', '-') }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="text-right">
+        <a href="/assets" class="text-blue-600 hover:underline">→ Ga naar assets</a>
+      </div>
+    </div>
+  </body>
+</html>
