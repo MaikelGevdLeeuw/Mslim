@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <body>
+    <h2>Asset toevoegen</h2>
+    <form method="POST" action="/add_asset">
+      Naam: <input name="name" required><br>
+      Type: <input name="type" required><br>
+      Locatie: <input name="location" required><br>
+      Serienummer: <input name="serial" required><br>
+      <button type="submit">Toevoegen</button>
+    </form>
+
+    <h3>Assetlijst</h3>
+    <table border="1">
+      <tr><th>ID</th><th>Naam</th><th>Type</th><th>Locatie</th><th>Serienummer</th></tr>
+      {% for asset in assets %}
+        <tr>
+          <td>{{ asset.id }}</td>
+          <td>{{ asset.name }}</td>
+          <td>{{ asset.type }}</td>
+          <td>{{ asset.location }}</td>
+          <td>{{ asset.serial }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+
+    <a href="/">← Terug</a>
+  </body>
+</html>
