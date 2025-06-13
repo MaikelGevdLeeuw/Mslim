@@ -4,7 +4,6 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'geheim123'
 
-# Gebruikers met rol
 users = {
     "admin": {"password": "admin123", "role": "admin"},
     "user1": {"password": "user123", "role": "user"},
@@ -20,14 +19,13 @@ def index():
 
     role = session.get("role")
     username = session.get("user")
-
     today = datetime.today().strftime("%Y-%m-%d")
 
     if role == "admin":
         today_permits = [p for p in permits if p.get("date") == today]
         return render_template("index.html", permits=permits, today_permits=today_permits, role=role)
 
-    elif role == "user":
+    else:
         user_permits = [p for p in permits if p.get("engineer") == username]
         today_permits = [p for p in user_permits if p.get("date") == today]
         return render_template("index.html", permits=user_permits, today_permits=today_permits, role=role)
@@ -46,9 +44,21 @@ def submit():
         'type': request.form['type'],
         'iso': request.form['iso'],
         'chg': request.form['chg'],
-        'status': 'pending'  # nieuw
+        'status': 'pending'
     }
     permits.append(permit)
+    return redirect('/')
+
+@app.route('/update_status/<int:number>', methods=['POST'])
+def update_status(number):
+    if session.get("role") != "admin":
+        return "Geen toegang", 403
+
+    new_status = request.form.get("status")
+    for p in permits:
+        if p["number"] == number:
+            p["status"] = new_status
+            break
     return redirect('/')
 
 @app.route('/login', methods=['GET', 'POST'])
