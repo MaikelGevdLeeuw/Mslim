@@ -10,7 +10,10 @@ users = {
 }
 
 permits = []
-assets = []
+assets = [
+    {'id': 1, 'name': 'Koeling A', 'type': 'HVAC', 'location': 'Room 1', 'serial': 'ABC123', 'category': 'Cooling'},
+    {'id': 2, 'name': 'PDU 5', 'type': 'Power', 'location': 'Room 2', 'serial': 'XYZ456', 'category': 'Power'}
+]
 
 @app.route('/')
 def index():
@@ -23,28 +26,33 @@ def index():
 
     if role == "admin":
         today_permits = [p for p in permits if p.get("date") == today]
-        return render_template("index.html", permits=permits, today_permits=today_permits, role=role)
+        return render_template("index.html", permits=permits, today_permits=today_permits, role=role, assets=assets)
 
     else:
         user_permits = [p for p in permits if p.get("engineer") == username]
         today_permits = [p for p in user_permits if p.get("date") == today]
-        return render_template("index.html", permits=user_permits, today_permits=today_permits, role=role)
+        return render_template("index.html", permits=user_permits, today_permits=today_permits, role=role, assets=assets)
 
 @app.route('/submit', methods=['POST'])
 def submit():
     if not session.get("user"):
         return redirect("/login")
 
+    asset_id = int(request.form['asset'])
+    asset = next((a for a in assets if a['id'] == asset_id), None)
+
     permit = {
         'number': len(permits) + 1,
         'engineer': session.get('user'),
         'date': request.form['date'],
         'time': request.form['time'],
-        'area': request.form['area'],
+        'area': asset['location'] if asset else request.form['area'],
         'type': request.form['type'],
         'iso': request.form['iso'],
         'chg': request.form['chg'],
-        'status': 'pending'
+        'status': 'pending',
+        'asset': asset['name'] if asset else 'Onbekend',
+        'category': asset['category'] if asset else 'Onbekend'
     }
     permits.append(permit)
     return redirect('/')
