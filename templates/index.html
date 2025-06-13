@@ -1,19 +1,68 @@
 <!doctype html>
 <html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Permit Systeem</title>
+  </head>
   <body>
+    <p>Ingelogd als {{ session['user'] }} | <a href="/logout">Uitloggen</a></p>
+
     <h2>Permit aanvragen</h2>
     <form method="POST" action="/submit">
-      Naam: <input type="text" name="name" required>
+      <label>Datum:</label>
+      <input type="date" name="date" required><br><br>
+
+      <label>Tijd:</label>
+      <input type="time" name="time" required><br><br>
+
+      <label>Gebied (Area):</label>
+      <input type="text" name="area" required><br><br>
+
+      <label>Type werkzaamheden:</label>
+      <input type="text" name="type" required><br><br>
+
+      <label>ISO gerelateerd:</label>
+      <select name="iso" required>
+        <option value="Ja">Ja</option>
+        <option value="Nee">Nee</option>
+      </select><br><br>
+
+      <label>CHG Nummer:</label>
+      <input type="text" name="chg" required><br><br>
+
       <button type="submit">Aanvragen</button>
     </form>
 
     <h3>Aangevraagde permits</h3>
-    <ul>
-      {% for permit in permits %}
-        <li>{{ permit.name }}</li>
-      {% endfor %}
-    </ul>
+    <table border="1" cellpadding="5" cellspacing="0">
+      <thead>
+        <tr>
+          <th>Permit #</th>
+          <th>Engineer</th>
+          <th>Datum</th>
+          <th>Tijd</th>
+          <th>Gebied</th>
+          <th>Type</th>
+          <th>ISO</th>
+          <th>CHG</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in permits %}
+        <tr>
+          <td>{{ p.number }}</td>
+          <td>{{ p.engineer }}</td>
+          <td>{{ p.date }}</td>
+          <td>{{ p.time }}</td>
+          <td>{{ p.area }}</td>
+          <td>{{ p.type }}</td>
+          <td>{{ p.iso }}</td>
+          <td>{{ p.chg }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-    <a href="/assets">Bekijk assets</a>
+    <p><a href="/assets">→ Ga naar assets</a></p>
   </body>
 </html>
