@@ -30,8 +30,8 @@
               <th class="p-2 border">Engineer</th>
               <th class="p-2 border">Datum</th>
               <th class="p-2 border">Tijd</th>
-              <th class="p-2 border">Gebied</th>
-              <th class="p-2 border">Type</th>
+              <th class="p-2 border">Asset</th>
+              <th class="p-2 border">Categorie</th>
               <th class="p-2 border">CHG</th>
               <th class="p-2 border">Status</th>
               <th class="p-2 border">Actie</th>
@@ -44,8 +44,8 @@
               <td class="p-2 border">{{ p.engineer }}</td>
               <td class="p-2 border">{{ p.date }}</td>
               <td class="p-2 border">{{ p.time }}</td>
-              <td class="p-2 border">{{ p.area }}</td>
-              <td class="p-2 border">{{ p.type }}</td>
+              <td class="p-2 border">{{ p.asset }}</td>
+              <td class="p-2 border">{{ p.category }}</td>
               <td class="p-2 border">{{ p.chg }}</td>
               <td class="p-2 border">{{ p.status }}</td>
               <td class="p-2 border">
@@ -64,11 +64,12 @@
       </div>
       {% endif %}
 
+      {% if role == "user" %}
       <form method="POST" action="/submit" class="grid grid-cols-2 gap-4">
         <div><label>Datum:</label><input type="date" name="date" required class="w-full border px-2 py-1 rounded"></div>
         <div><label>Tijd:</label><input type="time" name="time" required class="w-full border px-2 py-1 rounded"></div>
-        <div><label>Gebied:</label><input type="text" name="area" required class="w-full border px-2 py-1 rounded"></div>
         <div><label>Type:</label><input type="text" name="type" required class="w-full border px-2 py-1 rounded"></div>
+        <div><label>CHG Nummer:</label><input type="text" name="chg" required class="w-full border px-2 py-1 rounded"></div>
         <div>
           <label>ISO gerelateerd:</label>
           <select name="iso" class="w-full border px-2 py-1 rounded">
@@ -76,19 +77,28 @@
             <option value="Nee">Nee</option>
           </select>
         </div>
-        <div><label>CHG Nummer:</label><input type="text" name="chg" required class="w-full border px-2 py-1 rounded"></div>
+        <div>
+          <label>Asset:</label>
+          <select name="asset" class="w-full border px-2 py-1 rounded" required>
+            {% for asset in assets %}
+              <option value="{{ asset.id }}">{{ asset.category }} - {{ asset.name }} ({{ asset.location }})</option>
+            {% endfor %}
+          </select>
+        </div>
         <div class="col-span-2">
           <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Aanvragen</button>
         </div>
       </form>
+      {% endif %}
 
-      <h2 class="text-xl font-bold">Permits voor vandaag</h2>
+      <h2 class="text-xl font-bold">Permits vandaag</h2>
       <table class="table-auto w-full border border-yellow-300 text-sm">
         <thead class="bg-yellow-100">
           <tr>
             <th class="p-2 border">#</th>
             <th class="p-2 border">Tijd</th>
-            <th class="p-2 border">Gebied</th>
+            <th class="p-2 border">Asset</th>
+            <th class="p-2 border">Categorie</th>
             <th class="p-2 border">Type</th>
             <th class="p-2 border">CHG</th>
             <th class="p-2 border">Status</th>
@@ -99,37 +109,8 @@
           <tr>
             <td class="p-2 border">{{ p.number }}</td>
             <td class="p-2 border">{{ p.time }}</td>
-            <td class="p-2 border">{{ p.area }}</td>
-            <td class="p-2 border">{{ p.type }}</td>
-            <td class="p-2 border">{{ p.chg }}</td>
-            <td class="p-2 border">{{ p.status }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      <h2 class="text-xl font-bold">Alle permits</h2>
-      <table class="table-auto w-full border border-gray-300 text-sm">
-        <thead class="bg-gray-200">
-          <tr>
-            <th class="p-2 border">#</th>
-            <th class="p-2 border">Engineer</th>
-            <th class="p-2 border">Datum</th>
-            <th class="p-2 border">Tijd</th>
-            <th class="p-2 border">Gebied</th>
-            <th class="p-2 border">Type</th>
-            <th class="p-2 border">CHG</th>
-            <th class="p-2 border">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for p in permits %}
-          <tr>
-            <td class="p-2 border">{{ p.number }}</td>
-            <td class="p-2 border">{{ p.engineer }}</td>
-            <td class="p-2 border">{{ p.date }}</td>
-            <td class="p-2 border">{{ p.time }}</td>
-            <td class="p-2 border">{{ p.area }}</td>
+            <td class="p-2 border">{{ p.asset }}</td>
+            <td class="p-2 border">{{ p.category }}</td>
             <td class="p-2 border">{{ p.type }}</td>
             <td class="p-2 border">{{ p.chg }}</td>
             <td class="p-2 border">{{ p.status }}</td>
