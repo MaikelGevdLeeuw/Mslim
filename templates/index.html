@@ -7,6 +7,7 @@
   </head>
   <body class="bg-gray-100 text-gray-900 font-sans p-8">
     <div class="max-w-4xl mx-auto bg-white shadow-md rounded-xl p-6 space-y-6">
+      
       <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold">Permit Systeem</h1>
         <div class="text-sm">
@@ -17,76 +18,24 @@
 
       <form method="POST" action="/submit" class="grid grid-cols-2 gap-4">
         <div>
-          <label>Datum:</label>
+          <label class="block mb-1">Datum:</label>
           <input type="date" name="date" required class="w-full border rounded px-2 py-1">
         </div>
         <div>
-          <label>Tijd:</label>
+          <label class="block mb-1">Tijd:</label>
           <input type="time" name="time" required class="w-full border rounded px-2 py-1">
         </div>
         <div>
-          <label>Gebied (Area):</label>
+          <label class="block mb-1">Gebied (Area):</label>
           <input type="text" name="area" required class="w-full border rounded px-2 py-1">
         </div>
         <div>
-          <label>Type werkzaamheden:</label>
+          <label class="block mb-1">Type werkzaamheden:</label>
           <input type="text" name="type" required class="w-full border rounded px-2 py-1">
         </div>
         <div>
-          <label>ISO gerelateerd:</label>
+          <label class="block mb-1">ISO gerelateerd:</label>
           <select name="iso" required class="w-full border rounded px-2 py-1">
             <option value="Ja">Ja</option>
             <option value="Nee">Nee</option>
           </select>
-        </div>
-        <div>
-          <label>CHG Nummer:</label>
-          <input type="text" name="chg" required class="w-full border rounded px-2 py-1">
-        </div>
-        <div class="col-span-2">
-          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Permit aanvragen
-          </button>
-        </div>
-      </form>
-
-      <div>
-        <h2 class="text-xl font-semibold mt-6 mb-2">Aangevraagde permits</h2>
-        <div class="overflow-auto">
-          <table class="table-auto w-full border border-gray-300 text-sm">
-            <thead class="bg-gray-200">
-              <tr>
-                <th class="p-2 border">#</th>
-                <th class="p-2 border">Engineer</th>
-                <th class="p-2 border">Datum</th>
-                <th class="p-2 border">Tijd</th>
-                <th class="p-2 border">Gebied</th>
-                <th class="p-2 border">Type</th>
-                <th class="p-2 border">ISO</th>
-                <th class="p-2 border">CHG</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for p in permits %}
-              <tr class="hover:bg-gray-50">
-                <td class="p-2 border">{{ p.number }}</td>
-                <td class="p-2 border">{{ p.engineer }}</td>
-                <td class="p-2 border">{{ p.date }}</td>
-                <td class="p-2 border">{{ p.time }}</td>
-                <td class="p-2 border">{{ p.area }}</td>
-                <td class="p-2 border">{{ p.type }}</td>
-                <td class="p-2 border">{{ p.iso }}</td>
-                <td class="p-2 border">{{ p.chg }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="text-right">
-        <a href="/assets" class="text-blue-600 hover:underline">→ Ga naar assets</a>
-      </div>
-    </div>
-  </body>
-</html>
