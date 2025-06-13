@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Shift Log</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-10">
+  <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow space-y-6">
+    <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded">
+      <div class="space-x-4">
+        <a href="/" class="hover:underline">Permits</a>
+        <a href="/assets" class="hover:underline">Assets</a>
+        <a href="/home" class="hover:underline">Home</a>
+      </div>
+      <div>
+        Ingelogd als <strong>{{ user }}</strong> |
+        <a href="/logout" class="text-red-300 hover:underline">Uitloggen</a>
+      </div>
+    </div>
+
+    <h2 class="text-xl font-bold">Shift Log</h2>
+    <form method="POST">
+      <textarea name="log" class="w-full border p-2 rounded h-40">{{ log }}</textarea>
+      <div class="mt-4">
+        <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Opslaan</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
