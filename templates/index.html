@@ -1,123 +1,143 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Permits</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-gray-100 p-10">
-    <div class="max-w-6xl mx-auto bg-white p-6 rounded shadow space-y-6">
+<head>
+  <meta charset="UTF-8">
+  <title>Permits</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-10">
+  <div class="max-w-5xl mx-auto bg-white p-6 rounded shadow space-y-6">
 
-      <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded">
-        <div class="space-x-4">
-          <a href="/" class="hover:underline">Permits</a>
-          <a href="/assets" class="hover:underline">Assets</a>
-          <a href="/settings" class="hover:underline">Settings</a>
-        </div>
-        <div>
-          Ingelogd als <strong>{{ session['user'] }}</strong> |
-          <a href="/logout" class="text-red-300 hover:underline">Uitloggen</a>
-        </div>
+    <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded">
+      <div class="space-x-4">
+        <a href="/" class="hover:underline">Permits</a>
+        <a href="/assets" class="hover:underline">Assets</a>
+        <a href="/settings" class="hover:underline">Settings</a>
       </div>
-
-      {% if role == "admin" %}
       <div>
-        <h2 class="text-xl font-bold text-red-600">Wachtende permits (pending)</h2>
-        <table class="table-auto w-full border border-red-300 text-sm mb-6">
-          <thead class="bg-red-100">
-            <tr>
-              <th class="p-2 border">#</th>
-              <th class="p-2 border">Engineer</th>
-              <th class="p-2 border">Datum</th>
-              <th class="p-2 border">Tijd</th>
-              <th class="p-2 border">Asset</th>
-              <th class="p-2 border">Categorie</th>
-              <th class="p-2 border">CHG</th>
-              <th class="p-2 border">Status</th>
-              <th class="p-2 border">Actie</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for p in permits if p.status == 'pending' %}
-            <tr class="hover:bg-red-50">
-              <td class="p-2 border">{{ p.number }}</td>
-              <td class="p-2 border">{{ p.engineer }}</td>
-              <td class="p-2 border">{{ p.date }}</td>
-              <td class="p-2 border">{{ p.time }}</td>
-              <td class="p-2 border">{{ p.asset }}</td>
-              <td class="p-2 border">{{ p.category }}</td>
-              <td class="p-2 border">{{ p.chg }}</td>
-              <td class="p-2 border">{{ p.status }}</td>
-              <td class="p-2 border">
-                <form method="POST" action="/update_status/{{ p.number }}" class="flex space-x-1">
-                  <select name="status" class="border rounded px-1 py-0.5 text-sm">
-                    <option value="approved">Approve</option>
-                    <option value="rejected">Reject</option>
-                  </select>
-                  <button type="submit" class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded">OK</button>
-                </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        Ingelogd als <strong>{{ session['user'] }}</strong> |
+        <a href="/logout" class="text-red-300 hover:underline">Uitloggen</a>
       </div>
-      {% endif %}
-
-      {% if role == "user" %}
-      <form method="POST" action="/submit" class="grid grid-cols-2 gap-4">
-        <div><label>Datum:</label><input type="date" name="date" required class="w-full border px-2 py-1 rounded"></div>
-        <div><label>Tijd:</label><input type="time" name="time" required class="w-full border px-2 py-1 rounded"></div>
-        <div><label>Type:</label><input type="text" name="type" required class="w-full border px-2 py-1 rounded"></div>
-        <div><label>CHG Nummer:</label><input type="text" name="chg" required class="w-full border px-2 py-1 rounded"></div>
-        <div>
-          <label>ISO gerelateerd:</label>
-          <select name="iso" class="w-full border px-2 py-1 rounded">
-            <option value="Ja">Ja</option>
-            <option value="Nee">Nee</option>
-          </select>
-        </div>
-        <div>
-          <label>Asset:</label>
-          <select name="asset" class="w-full border px-2 py-1 rounded" required>
-            {% for asset in assets %}
-              <option value="{{ asset.id }}">{{ asset.category }} - {{ asset.name }} ({{ asset.location }})</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-span-2">
-          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Aanvragen</button>
-        </div>
-      </form>
-      {% endif %}
-
-      <h2 class="text-xl font-bold">Permits vandaag</h2>
-      <table class="table-auto w-full border border-yellow-300 text-sm">
-        <thead class="bg-yellow-100">
-          <tr>
-            <th class="p-2 border">#</th>
-            <th class="p-2 border">Tijd</th>
-            <th class="p-2 border">Asset</th>
-            <th class="p-2 border">Categorie</th>
-            <th class="p-2 border">Type</th>
-            <th class="p-2 border">CHG</th>
-            <th class="p-2 border">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for p in today_permits %}
-          <tr>
-            <td class="p-2 border">{{ p.number }}</td>
-            <td class="p-2 border">{{ p.time }}</td>
-            <td class="p-2 border">{{ p.asset }}</td>
-            <td class="p-2 border">{{ p.category }}</td>
-            <td class="p-2 border">{{ p.type }}</td>
-            <td class="p-2 border">{{ p.chg }}</td>
-            <td class="p-2 border">{{ p.status }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
     </div>
-  </body>
+
+    <h2 class="text-xl font-bold">Nieuwe Permit</h2>
+    <form method="POST" action="/submit" class="grid grid-cols-2 gap-4 bg-gray-100 p-4 rounded">
+      <div>
+        <label>Categorie</label>
+        <select name="category" id="category-select" required class="w-full border p-1 rounded">
+          <option value="">Selecteer categorie</option>
+          {% for c in assets | map(attribute='category') | unique %}
+            <option value="{{ c }}">{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label>Asset</label>
+        <select name="asset" id="asset-select" required class="w-full border p-1 rounded">
+          <option value="">Selecteer eerst een categorie</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Locatie</label>
+        <input name="area" id="area-field" readonly class="w-full border p-1 rounded bg-gray-200">
+      </div>
+
+      <div>
+        <label>Site</label>
+        <input name="site" id="site-field" readonly class="w-full border p-1 rounded bg-gray-200">
+      </div>
+
+      <div>
+        <label>Datum</label>
+        <input type="date" name="date" required class="w-full border p-1 rounded">
+      </div>
+
+      <div>
+        <label>Tijd</label>
+        <input type="time" name="time" required class="w-full border p-1 rounded">
+      </div>
+
+      <div>
+        <label>Type werk</label>
+        <input name="type" required class="w-full border p-1 rounded">
+      </div>
+
+      <div>
+        <label>CHG nummer</label>
+        <input name="chg" class="w-full border p-1 rounded">
+      </div>
+
+      <div>
+        <label>ISO</label>
+        <input name="iso" class="w-full border p-1 rounded">
+      </div>
+
+      <div class="col-span-2">
+        <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Permit Aanvragen</button>
+      </div>
+    </form>
+
+    <h2 class="text-xl font-bold mt-10">Permits Vandaag</h2>
+    <table class="w-full border text-sm">
+      <thead>
+        <tr>
+          <th class="border p-1">#</th>
+          <th class="border p-1">Datum</th>
+          <th class="border p-1">Tijd</th>
+          <th class="border p-1">Engineer</th>
+          <th class="border p-1">Asset</th>
+          <th class="border p-1">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in today_permits %}
+        <tr>
+          <td class="border p-1">{{ p.number }}</td>
+          <td class="border p-1">{{ p.date }}</td>
+          <td class="border p-1">{{ p.time }}</td>
+          <td class="border p-1">{{ p.engineer }}</td>
+          <td class="border p-1">{{ p.asset }}</td>
+          <td class="border p-1">{{ p.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const categorySelect = document.getElementById('category-select');
+    const assetSelect = document.getElementById('asset-select');
+    const areaField = document.getElementById('area-field');
+    const siteField = document.getElementById('site-field');
+
+    categorySelect.addEventListener('change', async () => {
+      const category = categorySelect.value;
+      if (!category) return;
+
+      const res = await fetch(`/get_assets_by_category/${category}`);
+      const assets = await res.json();
+
+      assetSelect.innerHTML = '<option value="">Selecteer asset</option>';
+      assets.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.id;
+        opt.textContent = a.name;
+        opt.dataset.location = a.location;
+        opt.dataset.site = a.site;
+        assetSelect.appendChild(opt);
+      });
+
+      areaField.value = '';
+      siteField.value = '';
+    });
+
+    assetSelect.addEventListener('change', () => {
+      const selected = assetSelect.options[assetSelect.selectedIndex];
+      areaField.value = selected.dataset.location || '';
+      siteField.value = selected.dataset.site || '';
+    });
+  </script>
+</body>
 </html>
