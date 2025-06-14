@@ -1,17 +1,20 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <title>Shift Log</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-10">
-  <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow space-y-6">
-    <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded">
+<body class="bg-gray-100 p-10 text-sm">
+  <div class="max-w-5xl mx-auto bg-white p-6 rounded shadow space-y-6">
+
+    <!-- Navigatie -->
+    <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded mb-6">
       <div class="space-x-4">
         <a href="/" class="hover:underline">Permits</a>
         <a href="/assets" class="hover:underline">Assets</a>
         <a href="/home" class="hover:underline">Home</a>
+        <a href="/shift" class="hover:underline">Shift</a>
       </div>
       <div>
         Ingelogd als <strong>{{ user }}</strong> |
@@ -19,13 +22,96 @@
       </div>
     </div>
 
-    <h2 class="text-xl font-bold">Shift Log</h2>
-    <form method="POST">
-      <textarea name="log" class="w-full border p-2 rounded h-40">{{ log }}</textarea>
-      <div class="mt-4">
-        <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Opslaan</button>
+    <h1 class="text-xl font-bold">Shift Log - {{ user }}</h1>
+    <form method="POST" class="grid grid-cols-2 gap-4">
+
+      <input type="hidden" name="name" value="{{ user }}">
+
+      <div><label>Site / Building</label>
+        <input name="site" class="w-full border p-2 rounded" value="{{ log.site or '' }}">
+      </div>
+
+      <div><label>Date</label>
+        <input type="date" name="date" class="w-full border p-2 rounded" value="{{ log.date or '' }}">
+      </div>
+
+      <div><label>Time on duty</label>
+        <input type="time" name="time_on_duty" class="w-full border p-2 rounded" value="{{ log.time_on_duty or '' }}">
+      </div>
+
+      <div><label>Shift</label>
+        <select name="shift" class="w-full border p-2 rounded">
+          <option value="Morning shift" {% if log.shift == "Morning shift" %}selected{% endif %}>Morning shift</option>
+          <option value="Afternoon shift" {% if log.shift == "Afternoon shift" %}selected{% endif %}>Afternoon shift</option>
+          <option value="Night shift" {% if log.shift == "Night shift" %}selected{% endif %}>Night shift</option>
+        </select>
+      </div>
+
+      <div class="col-span-2"><label>1. Equipment issues / failures</label>
+        <textarea name="equipment_issues" class="w-full border p-2 rounded h-20">{{ log.equipment_issues or '' }}</textarea>
+      </div>
+
+      <div class="col-span-2"><label>2. Major alarms</label>
+        <textarea name="major_alarms" class="w-full border p-2 rounded h-20">{{ log.major_alarms or '' }}</textarea>
+      </div>
+
+      <div><label>3. Escorts</label>
+        <input name="escorts" class="w-full border p-2 rounded" value="{{ log.escorts or '' }}">
+      </div>
+
+      <div><label>4. PMs completed</label>
+        <textarea name="pms_completed" class="w-full border p-2 rounded h-20">{{ log.pms_completed or '' }}</textarea>
+      </div>
+
+      <div class="col-span-2"><label>5. LOTO in place</label>
+        <textarea name="loto" class="w-full border p-2 rounded h-20">{{ log.loto or '' }}</textarea>
+      </div>
+
+      <div><label>6. Vendors in</label>
+        <textarea name="vendors_in" class="w-full border p-2 rounded h-20">{{ log.vendors_in or '' }}</textarea>
+      </div>
+
+      <div><label>7. Vendors out</label>
+        <textarea name="vendors_out" class="w-full border p-2 rounded h-20">{{ log.vendors_out or '' }}</textarea>
+      </div>
+
+      <div><label>8. Start/stop round timestamps</label>
+        <input name="round_timestamps" class="w-full border p-2 rounded" value="{{ log.round_timestamps or '' }}">
+      </div>
+
+      <div><label>9. Deliveries</label>
+        <input name="deliveries" class="w-full border p-2 rounded" value="{{ log.deliveries or '' }}">
+      </div>
+
+      <div class="col-span-2"><label>10. Customer tickets / responses</label>
+        <textarea name="customer_tickets" class="w-full border p-2 rounded h-20">{{ log.customer_tickets or '' }}</textarea>
+      </div>
+
+      <div class="col-span-2"><label>11. Safety confirmation</label>
+        <textarea name="safety" class="w-full border p-2 rounded h-32">{{ log.safety or '' }}</textarea>
+      </div>
+
+      <div class="col-span-2"><label>12. Other notes</label>
+        <textarea name="others" class="w-full border p-2 rounded h-32">{{ log.others or '' }}</textarea>
+      </div>
+
+      <div><label>Time off duty</label>
+        <input type="time" name="time_off_duty" class="w-full border p-2 rounded" value="{{ log.time_off_duty or '' }}">
+      </div>
+
+      <div><label>Hours worked</label>
+        <input type="text" name="hours_worked" class="w-full border p-2 rounded" value="{{ log.hours_worked or '' }}">
+      </div>
+
+      <div class="col-span-2"><label>Electronic Signature</label>
+        <input name="signature" class="w-full border p-2 rounded" value="{{ log.signature or user }}">
+      </div>
+
+      <div class="col-span-2">
+        <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded">Shift opslaan</button>
       </div>
     </form>
+
   </div>
 </body>
 </html>
