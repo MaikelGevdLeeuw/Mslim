@@ -1,18 +1,20 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Assets</title>
+  <title>Asset Beheer</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-10">
-  <div class="max-w-[95vw] mx-auto bg-white p-6 rounded shadow space-y-6 overflow-x-auto">
+<body class="bg-gray-100 p-10 text-sm">
+  <div class="max-w-6xl mx-auto bg-white p-6 rounded shadow space-y-6">
 
-    <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded">
+    <!-- Navigatie -->
+    <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded mb-6">
       <div class="space-x-4">
         <a href="/" class="hover:underline">Permits</a>
         <a href="/assets" class="hover:underline">Assets</a>
-        <a href="/settings" class="hover:underline">Settings</a>
+        <a href="/home" class="hover:underline">Home</a>
+        <a href="/shift" class="hover:underline">Shift</a>
       </div>
       <div>
         Ingelogd als <strong>{{ session['user'] }}</strong> |
@@ -20,71 +22,80 @@
       </div>
     </div>
 
-    <div class="flex justify-between items-center">
-      <h2 class="text-2xl font-bold">Assetlijst</h2>
-      {% if role == 'admin' %}
-      <a href="/asset/add" class="bg-green-600 text-white px-4 py-2 rounded">+ Nieuwe Asset</a>
-      {% endif %}
-    </div>
+    <h1 class="text-xl font-bold">Asset Beheer</h1>
 
-    <table class="table-auto w-full border border-gray-300 text-xs">
-      <thead class="bg-gray-100">
-        <tr>
-          <th class="p-2 border">ID</th>
+    <!-- Selecteer om te bewerken -->
+    <form method="GET" class="mb-4">
+      <label>Selecteer asset om te bewerken:</label>
+      <select name="edit_id" onchange="this.form.submit()" class="w-full border p-2 rounded mt-1">
+        <option value="">Nieuw asset aanmaken</option>
+        {% for a in assets %}
+          <option value="{{ a.id }}" {% if edit_id == a.id %}selected{% endif %}>{{ a.name }}</option>
+        {% endfor %}
+      </select>
+    </form>
+
+    <!-- Formulier -->
+    <form method="POST" action="/assets" class="grid grid-cols-2 gap-4">
+      <input type="hidden" name="id" value="{{ asset.id or '' }}">
+      
+      <div><label>Naam</label><input name="name" class="w-full border p-2 rounded" value="{{ asset.name or '' }}"></div>
+      <div><label>Categorie</label><input name="category" class="w-full border p-2 rounded" value="{{ asset.category or '' }}"></div>
+      <div><label>Locatie</label><input name="location" class="w-full border p-2 rounded" value="{{ asset.location or '' }}"></div>
+      <div><label>Site</label><input name="site" class="w-full border p-2 rounded" value="{{ asset.site or '' }}"></div>
+      <div><label>Verdieping</label><input name="floor" class="w-full border p-2 rounded" value="{{ asset.floor or '' }}"></div>
+      <div><label>Kamer</label><input name="room" class="w-full border p-2 rounded" value="{{ asset.room or '' }}"></div>
+      <div><label>Vendor</label><input name="vendor" class="w-full border p-2 rounded" value="{{ asset.vendor or '' }}"></div>
+      <div><label>Vendor Telefoon</label><input name="vendor_phone" class="w-full border p-2 rounded" value="{{ asset.vendor_phone or '' }}"></div>
+      <div><label>Vendor Email</label><input name="vendor_email" class="w-full border p-2 rounded" value="{{ asset.vendor_email or '' }}"></div>
+      <div><label>Installatiedatum</label><input type="date" name="install_date" class="w-full border p-2 rounded" value="{{ asset.install_date or '' }}"></div>
+      <div><label>Laatste onderhoud</label><input type="date" name="last_maintenance" class="w-full border p-2 rounded" value="{{ asset.last_maintenance or '' }}"></div>
+      <div><label>Onderhoudsinterval (dagen)</label><input name="maintenance_interval" class="w-full border p-2 rounded" value="{{ asset.maintenance_interval or '' }}"></div>
+      <div><label>Onderhoud vervaldatum</label><input type="date" name="maintenance_due" class="w-full border p-2 rounded" value="{{ asset.maintenance_due or '' }}"></div>
+      <div><label>Contract actief</label>
+        <select name="contract_active" class="w-full border p-2 rounded">
+          <option value="ja" {% if asset.contract_active == 'ja' %}selected{% endif %}>Ja</option>
+          <option value="nee" {% if asset.contract_active == 'nee' %}selected{% endif %}>Nee</option>
+        </select>
+      </div>
+      <div><label>Actief</label>
+        <select name="active" class="w-full border p-2 rounded">
+          <option value="ja" {% if asset.active == 'ja' %}selected{% endif %}>Ja</option>
+          <option value="nee" {% if asset.active == 'nee' %}selected{% endif %}>Nee</option>
+        </select>
+      </div>
+      <div class="col-span-2"><label>Gerelateerde ISO</label><input name="iso" class="w-full border p-2 rounded" value="{{ asset.iso or '' }}"></div>
+      <div class="col-span-2"><label>Notities</label><textarea name="notes" class="w-full border p-2 rounded">{{ asset.notes or '' }}</textarea></div>
+      <div class="col-span-2">
+        <button class="bg-blue-600 text-white px-4 py-2 rounded">Opslaan</button>
+      </div>
+    </form>
+
+    <!-- Lijst -->
+    <h2 class="text-lg font-semibold mt-10">Alle Assets</h2>
+    <table class="w-full text-left border mt-2">
+      <thead>
+        <tr class="bg-gray-200 text-xs">
           <th class="p-2 border">Naam</th>
-          <th class="p-2 border">Type</th>
           <th class="p-2 border">Categorie</th>
           <th class="p-2 border">Locatie</th>
-          <th class="p-2 border">Verdieping</th>
           <th class="p-2 border">Site</th>
-          <th class="p-2 border">Serienummer</th>
-          <th class="p-2 border">Install</th>
-          <th class="p-2 border">Laatste Maint</th>
-          <th class="p-2 border">Vervalt</th>
-          <th class="p-2 border">Interval</th>
-          <th class="p-2 border">Contract</th>
           <th class="p-2 border">Actief</th>
-          <th class="p-2 border">ISO</th>
-          <th class="p-2 border">Vendor</th>
-          <th class="p-2 border">Tel</th>
-          <th class="p-2 border">Email</th>
-          <th class="p-2 border">Notes</th>
-          {% if role == 'admin' %}
-          <th class="p-2 border">Actie</th>
-          {% endif %}
         </tr>
       </thead>
       <tbody>
         {% for a in assets %}
-        <tr class="hover:bg-gray-50">
-          <td class="p-2 border">{{ a.id }}</td>
-          <td class="p-2 border">{{ a.name }}</td>
-          <td class="p-2 border">{{ a.type }}</td>
-          <td class="p-2 border">{{ a.category }}</td>
-          <td class="p-2 border">{{ a.location }}</td>
-          <td class="p-2 border">{{ a.floor }}</td>
-          <td class="p-2 border">{{ a.site }}</td>
-          <td class="p-2 border">{{ a.serial }}</td>
-          <td class="p-2 border">{{ a.install_date }}</td>
-          <td class="p-2 border">{{ a.last_maintenance }}</td>
-          <td class="p-2 border">{{ a.maintenance_due }}</td>
-          <td class="p-2 border">{{ a.maintenance_interval }}</td>
-          <td class="p-2 border">{{ 'Ja' if a.vendor_contract_active else 'Nee' }}</td>
-          <td class="p-2 border">{{ 'Ja' if a.active else 'Nee' }}</td>
-          <td class="p-2 border">{{ a.iso }}</td>
-          <td class="p-2 border">{{ a.vendor }}</td>
-          <td class="p-2 border">{{ a.vendor_phone }}</td>
-          <td class="p-2 border">{{ a.vendor_email }}</td>
-          <td class="p-2 border">{{ a.notes }}</td>
-          {% if role == 'admin' %}
-          <td class="p-2 border">
-            <a href="/asset/edit/{{ a.id }}" class="text-blue-600 underline">Bewerk</a>
-          </td>
-          {% endif %}
+        <tr class="text-xs">
+          <td class="border px-2">{{ a.name }}</td>
+          <td class="border px-2">{{ a.category }}</td>
+          <td class="border px-2">{{ a.location }}</td>
+          <td class="border px-2">{{ a.site }}</td>
+          <td class="border px-2">{{ a.active }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+
   </div>
 </body>
 </html>
