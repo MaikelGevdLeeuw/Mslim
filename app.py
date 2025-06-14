@@ -137,3 +137,7 @@ def shift():
 
     log = shift_logs.get(user, {})
     return render_template("shift.html", log=log, user=user)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000)
+
