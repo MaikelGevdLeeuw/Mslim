@@ -4,11 +4,13 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'geheim123'
 
+# Gebruikers met rollen
 users = {
     "admin": {"password": "admin123", "role": "admin"},
     "user1": {"password": "user123", "role": "user"},
 }
 
+# Globale lijsten (in-memory opslag)
 permits = []
 assets = []
 tasks = [
@@ -21,7 +23,7 @@ shift_logs = {}
 def index():
     if not session.get("user"):
         return redirect("/login")
-
+    
     username = session["user"]
     role = session["role"]
     today = datetime.today().strftime("%Y-%m-%d")
