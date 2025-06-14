@@ -2,18 +2,16 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Permit Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script> 
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-10 text-sm">
   <div class="max-w-6xl mx-auto bg-white p-6 rounded shadow space-y-6">
 
     <!-- Navigatie -->
-    <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded mb-6">
+    <div class="bg-gray-800 text-white px-4 py-2 flex justify-between items-center rounded">
       <div class="space-x-4">
-        <a href="/" class="hover:underline">Permits</a>
-        <a href="/assets" class="hover:underline">Assets</a>
-        <a href="/home" class="hover:underline">Home</a>
+        <a href="/" class="hover:underline">Home</a>
         <a href="/shift" class="hover:underline">Shift</a>
       </div>
       <div>
@@ -22,141 +20,103 @@
       </div>
     </div>
 
-    <h1 class="text-xl font-bold">Permit Aanvragen</h1>
-    <form method="POST" action="/submit" class="grid grid-cols-2 gap-4 bg-gray-100 p-4 rounded">
-      <div>
-        <label>Categorie</label>
-        <select name="category" id="category-select" required class="w-full border p-1 rounded">
-          <option value="">Selecteer categorie</option>
-          {% for c in assets | map(attribute='category') | unique %}
-            <option value="{{ c }}">{{ c }}</option>
+    {% if role == 'admin' %}
+      <h1 class="text-xl font-bold">Admin Dashboard</h1>
+      <form method="POST" action="/assign_task" class="grid grid-cols-2 gap-4 bg-gray-100 p-4 rounded">
+        <div><label>Gebruiker</label>
+          <select name="assigned_to" class="w-full border p-2 rounded">
+            {% for u in users %}
+              <option value="{{ u }}">{{ u }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div><label>Taak</label><input name="title" class="w-full border p-2 rounded"></div>
+        <div><label>Startdatum</label><input type="date" name="start" class="w-full border p-2 rounded"></div>
+        <div><label>Einddatum</label><input type="date" name="end" class="w-full border p-2 rounded"></div>
+        <div class="col-span-2">
+          <button class="bg-blue-600 text-white px-4 py-2 rounded">Taak toewijzen</button>
+        </div>
+      </form>
+
+      <h2 class="text-lg font-semibold mt-6">Alle Taken</h2>
+      <table class="w-full border mt-2 text-sm">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="border p-2">Gebruiker</th>
+            <th class="border p-2">Taak</th>
+            <th class="border p-2">Van</th>
+            <th class="border p-2">Tot</th>
+            <th class="border p-2">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in tasks %}
+          <tr>
+            <td class="border p-2">{{ t.assigned_to }}</td>
+            <td class="border p-2">{{ t.title }}</td>
+            <td class="border p-2">{{ t.start }}</td>
+            <td class="border p-2">{{ t.end }}</td>
+            <td class="border p-2">{{ t.status }}</td>
+          </tr>
           {% endfor %}
-        </select>
-      </div>
+        </tbody>
+      </table>
 
-      <div>
-        <label>Asset</label>
-        <select name="asset" id="asset-select" required class="w-full border p-1 rounded">
-          <option value="">Selecteer eerst een categorie</option>
-        </select>
-      </div>
+    {% else %}
+      <h1 class="text-xl font-bold">Welkom {{ user }}</h1>
 
-      <div>
-        <label>Locatie</label>
-        <input name="area" id="area-field" readonly class="w-full border p-1 rounded bg-gray-200">
-      </div>
+      {% if notifications %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
+          <strong>Let op!</strong> Je hebt openstaande/verlopen taken:
+          <ul class="list-disc pl-5">
+            {% for n in notifications %}
+              <li>{{ n.title }} (tot {{ n.end }})</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
 
-      <div>
-        <label>Site</label>
-        <input name="site" id="site-field" readonly class="w-full border p-1 rounded bg-gray-200">
-      </div>
-
-      <div>
-        <label>Verdieping</label>
-        <input name="floor" required class="w-full border p-1 rounded">
-      </div>
-
-      <div>
-        <label>Kamer</label>
-        <input name="room" required class="w-full border p-1 rounded">
-      </div>
-
-      <div>
-        <label>Datum</label>
-        <input type="date" name="date" required class="w-full border p-1 rounded">
-      </div>
-
-      <div>
-        <label>Tijd</label>
-        <input type="time" name="time" required class="w-full border p-1 rounded">
-      </div>
-
-      <div>
-        <label>Type werk</label>
-        <input name="type" required class="w-full border p-1 rounded">
-      </div>
-
-      <div>
-        <label>CHG nummer</label>
-        <input name="chg" class="w-full border p-1 rounded">
-      </div>
-
-      <div>
-        <label>ISO</label>
-        <input name="iso" class="w-full border p-1 rounded">
-      </div>
-
-      <div class="col-span-2">
-        <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Permit Aanvragen</button>
-      </div>
-    </form>
-
-    <!-- Vandaag openstaande permits -->
-    <h2 class="text-lg font-semibold mt-10">Permits vandaag</h2>
-    <table class="w-full text-left border mt-2">
-      <thead>
-        <tr class="bg-gray-200">
-          <th class="p-2 border">Nummer</th>
-          <th class="p-2 border">Datum</th>
-          <th class="p-2 border">Tijd</th>
-          <th class="p-2 border">Categorie</th>
-          <th class="p-2 border">Asset</th>
-          <th class="p-2 border">Ruimte</th>
-          <th class="p-2 border">Status</th>
-          <th class="p-2 border">Engineer</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for p in today_permits %}
-        <tr>
-          <td class="border px-2">{{ p.number }}</td>
-          <td class="border px-2">{{ p.date }}</td>
-          <td class="border px-2">{{ p.time }}</td>
-          <td class="border px-2">{{ p.category }}</td>
-          <td class="border px-2">{{ p.asset }}</td>
-          <td class="border px-2">{{ p.area }}</td>
-          <td class="border px-2">{{ p.status }}</td>
-          <td class="border px-2">{{ p.engineer }}</td>
-        </tr>
+      <h2 class="text-lg font-semibold mt-4">Taken voor vandaag</h2>
+      <ul class="list-disc ml-5">
+        {% for t in today_tasks %}
+          <li>
+            {{ t.title }} (tot {{ t.end }}) 
+            {% if t.status != 'completed' %}
+              <form method="POST" action="/complete_task" style="display:inline;">
+                <input type="hidden" name="index" value="{{ loop.index0 }}">
+                <button class="text-blue-600 underline text-sm ml-2">Markeer als voltooid</button>
+              </form>
+            {% else %} ✅ {% endif %}
+          </li>
         {% endfor %}
-      </tbody>
-    </table>
+      </ul>
+
+      <h2 class="text-lg font-semibold mt-4">Taken deze week</h2>
+      <ul class="list-disc ml-5">
+        {% for t in week_tasks %}
+          <li>{{ t.title }} ({{ t.start }} - {{ t.end }})</li>
+        {% endfor %}
+      </ul>
+
+      <h2 class="text-lg font-semibold mt-4">Permits vandaag</h2>
+      <ul class="list-disc ml-5">
+        {% for p in today_permits %}
+          <li>{{ p.type }} in {{ p.area }} ({{ p.time }})</li>
+        {% endfor %}
+      </ul>
+
+      <h2 class="text-lg font-semibold mt-4">Permits deze week</h2>
+      <ul class="list-disc ml-5">
+        {% for p in week_permits %}
+          <li>{{ p.type }} - {{ p.date }}</li>
+        {% endfor %}
+      </ul>
+
+      <div class="mt-6">
+        <a href="/shift" class="bg-blue-600 text-white px-4 py-2 rounded inline-block">Ga naar Shift Overdracht</a>
+      </div>
+    {% endif %}
 
   </div>
-
-  <!-- Javascript dropdown logica -->
-  <script>
-    const categorySelect = document.getElementById('category-select');
-    const assetSelect = document.getElementById('asset-select');
-    const areaField = document.getElementById('area-field');
-    const siteField = document.getElementById('site-field');
-
-    categorySelect.addEventListener('change', async () => {
-      const category = categorySelect.value;
-      if (!category) return;
-
-      const res = await fetch(`/get_assets_by_category/${category}`);
-      const assets = await res.json();
-
-      assetSelect.innerHTML = '<option value="">Selecteer asset</option>';
-      assets.forEach(a => {
-        const opt = document.createElement('option');
-        opt.value = a.id;
-        opt.textContent = a.name;
-        opt.dataset.location = a.location;
-        opt.dataset.site = a.site;
-        assetSelect.appendChild(opt);
-      });
-
-      areaField.value = '';
-      siteField.value = '';
-    });
-
-    assetSelect.addEventListener('change', () => {
-      const selected = assetSelect.options[assetSelect.selectedIndex];
-      areaField.value = selected.dataset.location || '';
-      siteField.value = selected.dataset.site || '';
-    });
-  </script>
 </body>
 </html>
